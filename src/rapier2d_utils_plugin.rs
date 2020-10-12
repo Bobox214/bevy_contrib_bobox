@@ -2,8 +2,7 @@ use bevy::prelude::*;
 use bevy_rapier2d::{
     physics::RigidBodyHandleComponent, rapier::dynamics::JointSet,
     rapier::dynamics::RigidBodyHandle, rapier::dynamics::RigidBodySet,
-    rapier::geometry::BroadPhase, rapier::geometry::ColliderSet, rapier::geometry::NarrowPhase,
-    rapier::pipeline::PhysicsPipeline,
+    rapier::geometry::ColliderSet,
 };
 use std::collections::HashMap;
 
@@ -40,9 +39,6 @@ fn body_to_entity_system(
 /// And inform rapier about the removal
 /// Requires the EntityToBodyHandle resource, as the
 fn remove_rigid_body_system(
-    mut pipeline: ResMut<PhysicsPipeline>,
-    mut broad_phase: ResMut<BroadPhase>,
-    mut narrow_phase: ResMut<NarrowPhase>,
     mut bodies: ResMut<RigidBodySet>,
     mut colliders: ResMut<ColliderSet>,
     mut joints: ResMut<JointSet>,
@@ -52,14 +48,7 @@ fn remove_rigid_body_system(
 ) {
     for entity in query.removed::<RigidBodyHandleComponent>().iter() {
         let handle = e_to_bh.0.get(entity).unwrap();
-        pipeline.remove_rigid_body(
-            *handle,
-            &mut broad_phase,
-            &mut narrow_phase,
-            &mut bodies,
-            &mut colliders,
-            &mut joints,
-        );
+        bodies.remove(*handle, &mut colliders, &mut joints);
         bh_to_e.0.remove(handle);
         e_to_bh.0.remove(entity);
     }
