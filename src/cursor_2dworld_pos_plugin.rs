@@ -29,9 +29,8 @@ impl Cursor2dWorldPos {
         camera_ortho: &OrthographicProjection,
         camera_transform: &Transform,
     ) {
-        let world_x = self.window_pos.x() + camera_ortho.left + camera_transform.translation().x();
-        let world_y =
-            self.window_pos.y() + camera_ortho.bottom + camera_transform.translation().y();
+        let world_x = self.window_pos.x() + camera_ortho.left + camera_transform.translation.x();
+        let world_y = self.window_pos.y() + camera_ortho.bottom + camera_transform.translation.y();
         self.world_pos = Vec2::new(world_x, world_y);
     }
 }

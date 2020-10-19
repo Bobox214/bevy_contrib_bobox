@@ -9,5 +9,5 @@ edition = "2018"
 rapier2d = [ "bevy_rapier2d"]
 
 [dependencies]
-bevy = "0.2.1"
+bevy = { git = "https://github.com/bevyengine/bevy" , rev="c32e637384936d973918fb59d1c37c0a4f4f41f7"}
 bevy_rapier2d = { version = "0.3.1" , optional=true}
