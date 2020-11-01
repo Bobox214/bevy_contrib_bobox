@@ -45,21 +45,21 @@ fn cursor_pos_system(
     mut state: Local<CursorSystemLocalState>,
     cursor_moved_events: Res<Events<CursorMoved>>,
     mut cursor_2dworld_pos: ResMut<Cursor2dWorldPos>,
-    mut query_camera: Query<(&Camera, &OrthographicProjection, &Transform)>,
+    query_camera: Query<(&Camera, &OrthographicProjection, &Transform)>,
     mut query_changed_camera: Query<(
         &Camera,
         Or<(Changed<OrthographicProjection>, Changed<Transform>)>,
     )>,
 ) {
     for event in state.cursor_moved_event_reader.iter(&cursor_moved_events) {
-        for (camera, camera_ortho, camera_transform) in &mut query_camera.iter() {
+        for (camera, camera_ortho, camera_transform) in query_camera.iter() {
             if camera.name == Some(CAMERA2D_NAME.to_string()) {
                 cursor_2dworld_pos.window_pos = Vec2::new(event.position.x(), event.position.y());
                 cursor_2dworld_pos.update_world_pos(camera_ortho, camera_transform);
             }
         }
     }
-    for (camera, (camera_ortho, camera_transform)) in &mut query_changed_camera.iter() {
+    for (camera, (camera_ortho, camera_transform)) in query_changed_camera.iter_mut() {
         if camera.name == Some(String::from("Camera2d")) {
             cursor_2dworld_pos.update_world_pos(&camera_ortho, &camera_transform);
         }
