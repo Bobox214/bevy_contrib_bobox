@@ -6,3 +6,8 @@ This crate will not be published on crates.io as it does not have real coherency
 
 Features:
 - rapier2d
+
+Plugins:
+- Outline2dPlugin:\
+    Add sprite outlining support for any SpriteComponents.\
+    See example/outline_2d for a simple usecase.
