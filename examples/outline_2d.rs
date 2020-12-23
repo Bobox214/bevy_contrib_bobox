@@ -1,11 +1,18 @@
-use bevy::prelude::*;
+use bevy::{
+    log::{Level, LogSettings},
+    prelude::*,
+};
 use bevy_contrib_bobox::{Outline2dPlugin, OutlineConfiguration, OutlineMaterial};
 fn main() {
     //env_logger::init();
     App::build()
         .add_resource(WindowDescriptor {
-            width: 600,
-            height: 400,
+            width: 600.0,
+            height: 400.0,
+            ..Default::default()
+        })
+        .add_resource(LogSettings {
+            level: Level::INFO,
             ..Default::default()
         })
         .add_plugins(DefaultPlugins)
@@ -17,14 +24,14 @@ fn main() {
 }
 
 fn setup(
-    mut commands: Commands,
+    commands: &mut Commands,
     asset_server: Res<AssetServer>,
     mut outline_materials: ResMut<Assets<OutlineMaterial>>,
     mut color_materials: ResMut<Assets<ColorMaterial>>,
 ) {
     commands
-        .spawn(Camera2dComponents::default())
-        .spawn(SpriteComponents {
+        .spawn(Camera2dBundle::default())
+        .spawn(SpriteBundle {
             material: color_materials.add(asset_server.load("icon.png").into()),
             transform: Transform {
                 translation: Vec3::new(-100.0, -20.0, 0.0),
@@ -41,8 +48,7 @@ fn setup(
         }));
 
     commands
-        .spawn(Camera2dComponents::default())
-        .spawn(SpriteComponents {
+        .spawn(SpriteBundle {
             material: color_materials.add(asset_server.load("playerShip1_red.png").into()),
             transform: Transform {
                 translation: Vec3::new(150.0, -20.0, 0.0),
@@ -57,23 +63,22 @@ fn setup(
             },
             with_outline: true,
         }));
-    commands
-        .spawn(UiCameraComponents::default())
-        .spawn(TextComponents {
-            style: Style {
-                align_self: AlignSelf::FlexEnd,
+    commands.spawn(CameraUiBundle::default()).spawn(TextBundle {
+        style: Style {
+            align_self: AlignSelf::FlexEnd,
+            ..Default::default()
+        },
+        text: Text {
+            value: "".to_string(),
+            font: asset_server.load("FiraSans-Bold.ttf"),
+            style: TextStyle {
+                font_size: 20.0,
+                color: Color::WHITE,
                 ..Default::default()
             },
-            text: Text {
-                value: "".to_string(),
-                font: asset_server.load("FiraSans-Bold.ttf"),
-                style: TextStyle {
-                    font_size: 20.0,
-                    color: Color::WHITE,
-                },
-            },
-            ..Default::default()
-        });
+        },
+        ..Default::default()
+    });
     // Just to ease keyboard input modification and text visualization
     commands.insert_resource(OutlineMaterial {
         with_outline: true,

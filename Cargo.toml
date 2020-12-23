@@ -1,9 +1,9 @@
 [package]
 name = "bevy_contrib_bobox"
-version = "0.3.0"
+version = "0.4.0"
 authors = ["Boris Boutillier <boris.boutillier@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-bevy = { version = "0.3.0" }
-#bevy = { path = "../forks/bevy" }
+bevy = { version = "0.4.0" }
+#bevy = { path = "../gits/bevy" }

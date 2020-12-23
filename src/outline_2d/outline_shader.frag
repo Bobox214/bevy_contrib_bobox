@@ -14,7 +14,7 @@ layout(set = 1, binding = 1) uniform texture2D ColorMaterial_texture;
 layout(set = 1, binding = 2) uniform sampler ColorMaterial_texture_sampler;
 # endif
 
-layout(set = 2, binding = 2) uniform OutlineMaterial_configuration {
+layout(set = 3, binding = 0) uniform OutlineMaterial_configuration {
     vec4 OutlineColor;
     int width;
     int inside;

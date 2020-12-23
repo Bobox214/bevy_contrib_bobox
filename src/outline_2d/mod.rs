@@ -1,14 +1,14 @@
 use bevy::{
     core::Bytes,
     prelude::*,
+    reflect::TypeUuid,
     render::shader::asset_shader_defs_system,
     render::{
-        pipeline::{DynamicBinding, PipelineDescriptor, PipelineSpecialization, RenderPipeline},
+        pipeline::{PipelineDescriptor, RenderPipeline},
         render_graph::{base, AssetRenderResourcesNode, RenderGraph},
         renderer::{RenderResource, RenderResources},
         shader::{ShaderDefs, ShaderStage, ShaderStages},
     },
-    type_registry::TypeUuid,
 };
 
 /// Allow to add an outline shader to a 'SpriteComponents'
@@ -26,8 +26,8 @@ impl Plugin for Outline2dPlugin {
             .add_startup_system(setup_outline_pipeline.system());
     }
 }
-const SPRITE_OUTLINE_PIPELINE: Handle<PipelineDescriptor> =
-    Handle::weak_from_u64(PipelineDescriptor::TYPE_UUID, 0xdec90e721f4b9a25);
+const SPRITE_OUTLINE_PIPELINE: HandleUntyped =
+    HandleUntyped::weak_from_u64(PipelineDescriptor::TYPE_UUID, 0xdec90e721f4b9a25);
 
 #[derive(Debug, RenderResources, ShaderDefs, TypeUuid)]
 #[uuid = "9d8440bd-cb6c-4265-a00a-09cda3a271a7"]
@@ -96,54 +96,33 @@ fn setup_outline_pipeline(
 
     pipelines.set_untracked(
         SPRITE_OUTLINE_PIPELINE,
-        PipelineDescriptor::default_config(ShaderStages {
-            vertex: shaders.add(Shader::from_glsl(
-                ShaderStage::Vertex,
-                include_str!("outline_shader.vert"),
-            )),
-            fragment: Some(shaders.add(Shader::from_glsl(
-                ShaderStage::Fragment,
-                include_str!("outline_shader.frag"),
-            ))),
-        }),
+        PipelineDescriptor {
+            name: Some("outline_2d_pipeline".to_string()),
+            ..PipelineDescriptor::default_config(ShaderStages {
+                vertex: shaders.add(Shader::from_glsl(
+                    ShaderStage::Vertex,
+                    include_str!("outline_shader.vert"),
+                )),
+                fragment: Some(shaders.add(Shader::from_glsl(
+                    ShaderStage::Fragment,
+                    include_str!("outline_shader.frag"),
+                ))),
+            })
+        },
     );
 }
 
 fn outlinable_sprite_system(
-    mut commands: Commands,
+    commands: &mut Commands,
     mut query: Query<
-        Without<WithOutlinePipeline, With<Handle<OutlineMaterial>, (Entity, Mut<RenderPipelines>)>>,
+        (Entity, Mut<RenderPipelines>),
+        (Without<WithOutlinePipeline>, With<Handle<OutlineMaterial>>),
     >,
 ) {
     for (entity, mut render_pipelines) in query.iter_mut() {
-        render_pipelines.pipelines.push(RenderPipeline::specialized(
-            SPRITE_OUTLINE_PIPELINE,
-            PipelineSpecialization {
-                dynamic_bindings: vec![
-                    // Transform
-                    DynamicBinding {
-                        bind_group: 2,
-                        binding: 0,
-                    },
-                    // Sprite
-                    DynamicBinding {
-                        bind_group: 2,
-                        binding: 1,
-                    },
-                    // Outline Color
-                    DynamicBinding {
-                        bind_group: 2,
-                        binding: 2,
-                    },
-                    // Outline Color
-                    DynamicBinding {
-                        bind_group: 2,
-                        binding: 3,
-                    },
-                ],
-                ..Default::default()
-            },
-        ));
+        render_pipelines
+            .pipelines
+            .push(RenderPipeline::new(SPRITE_OUTLINE_PIPELINE.typed()));
         commands.insert_one(entity, WithOutlinePipeline {});
     }
 }
